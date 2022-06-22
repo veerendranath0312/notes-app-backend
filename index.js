@@ -4,7 +4,7 @@ const cors = require('cors');
 const Note = require('./models/note.js');
 
 const app = express();
-app.use(express.json());
+app.use(express.json()); // This has to be very first middleware loaded
 app.use(express.static('build'));
 app.use(cors());
 
@@ -44,25 +44,38 @@ app.post('/api/v1/notes', (req, res) => {
 });
 
 // Get note by ID
-app.get('/api/v1/notes/:id', (req, res) => {
+app.get('/api/v1/notes/:id', (req, res, next) => {
   const { id } = req.params;
-  Note.findById(id).then(note => res.json(note));
+  Note.findById(id)
+    .then(note => {
+      if (note) {
+        res.json(note);
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch(err => next(err));
 });
 
-app.delete('/api/v1/notes/:id', (req, res) => {
+app.delete('/api/v1/notes/:id', (req, res, next) => {
   const { id } = req.params;
-  const singleNote = notes.find(notes => notes.id === Number(id));
+  Note.findByIdAndDelete(id)
+    .then(result => res.status(204).end())
+    .catch(err => next(err));
+});
 
-  if (!singleNote) {
-    return res.status(404).json({
-      success: false,
-      message: `Requested note with id ${id} not found`
-    });
-  }
+app.put('/api/v1/notes/:id', (req, res, next) => {
+  const { id } = req.params;
+  const data = req.body;
 
-  notes = notes.filter(note => note.id !== Number(id));
+  const note = {
+    content: data.content,
+    important: data.important
+  };
 
-  return res.status(204).end();
+  Note.findByIdAndUpdate(id, note, { new: true })
+    .then(updatedNote => res.json(updatedNote))
+    .catch(err => next(err));
 });
 
 const unknownEndpoint = (req, res) => {
@@ -72,6 +85,18 @@ const unknownEndpoint = (req, res) => {
 };
 
 app.use(unknownEndpoint);
+
+const errorHandler = (error, req, res, next) => {
+  console.log(error.message);
+
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
