@@ -1,53 +1,52 @@
-const { response, request } = require('express');
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const Note = require('./models/note.js');
 
 const app = express();
 app.use(express.json());
 app.use(express.static('build'));
 app.use(cors());
 
-let notes = [
-  {
-    id: 1,
-    content: 'HTML is easy',
-    date: '2022-05-30T17:30:31.098Z',
-    important: true
-  },
-  {
-    id: 2,
-    content: 'Browser can execute only Javascript',
-    date: '2022-05-30T18:39:34.091Z',
-    important: false
-  },
-  {
-    id: 3,
-    content: 'GET and POST are the most important methods of HTTP protocol',
-    date: '2022-05-30T19:20:14.298Z',
-    important: true
-  }
-];
-
 app.get('/', (req, res) => {
   res.status(200).send('<h1>Hi there 👋, Welcome!</h1>');
 });
 
+// Get all notes
 app.get('/api/v1/notes', (req, res) => {
-  res.status(200).json(notes);
+  Note.find({}).then(notes => {
+    res.json(notes);
+  });
 });
 
-app.get('/api/v1/notes/:id', (req, res) => {
-  const { id } = req.params;
-  const singleNote = notes.find(notes => notes.id === Number(id));
+// Create a note
+app.post('/api/v1/notes', (req, res) => {
+  const data = req.body;
 
-  if (!singleNote) {
-    return res.status(404).json({
-      success: false,
-      message: `Requested note with id ${id} not found`
+  // Checking if the content property is valid or not
+  if (!data.content) {
+    return response.status(400).json({
+      error: 'content missing'
     });
   }
 
-  return res.json(singleNote);
+  // Creating a new note object
+  const note = new Note({
+    content: data.content,
+    important: data.important || false,
+    date: new Date()
+  });
+
+  // Saving note to DB
+  note.save().then(savedNote => {
+    res.json(savedNote);
+  });
+});
+
+// Get note by ID
+app.get('/api/v1/notes/:id', (req, res) => {
+  const { id } = req.params;
+  Note.findById(id).then(note => res.json(note));
 });
 
 app.delete('/api/v1/notes/:id', (req, res) => {
@@ -66,33 +65,6 @@ app.delete('/api/v1/notes/:id', (req, res) => {
   return res.status(204).end();
 });
 
-const generateId = () => {
-  const maxId = notes.length > 0 ? Math.max(...notes.map(note => note.id)) : 0;
-  return maxId + 1;
-};
-
-app.post('/api/v1/notes', (req, res) => {
-  const data = req.body;
-
-  // Checking if the content property is valid or not
-  if (!data.content) {
-    return response.status(400).json({
-      error: 'content missing'
-    });
-  }
-
-  // Creating a new note object
-  const note = {
-    content: data.content,
-    important: data.important || false,
-    data: new Date(),
-    id: generateId()
-  };
-
-  notes = notes.concat(data);
-  res.json(data);
-});
-
 const unknownEndpoint = (req, res) => {
   res.status(404).json({
     error: 'unknown endpoint'
@@ -101,7 +73,7 @@ const unknownEndpoint = (req, res) => {
 
 app.use(unknownEndpoint);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Listening at port ${PORT}...`);
 });
