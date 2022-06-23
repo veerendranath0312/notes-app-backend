@@ -20,12 +20,12 @@ app.get('/api/v1/notes', (req, res) => {
 });
 
 // Create a note
-app.post('/api/v1/notes', (req, res) => {
+app.post('/api/v1/notes', (req, res, next) => {
   const data = req.body;
 
   // Checking if the content property is valid or not
   if (!data.content) {
-    return response.status(400).json({
+    return res.status(400).json({
       error: 'content missing'
     });
   }
@@ -38,9 +38,12 @@ app.post('/api/v1/notes', (req, res) => {
   });
 
   // Saving note to DB
-  note.save().then(savedNote => {
-    res.json(savedNote);
-  });
+  note
+    .save()
+    .then(savedNote => {
+      res.json(savedNote);
+    })
+    .catch(error => next(error));
 });
 
 // Get note by ID
@@ -66,14 +69,18 @@ app.delete('/api/v1/notes/:id', (req, res, next) => {
 
 app.put('/api/v1/notes/:id', (req, res, next) => {
   const { id } = req.params;
-  const data = req.body;
+  const { content, important } = req.body;
 
   const note = {
     content: data.content,
     important: data.important
   };
 
-  Note.findByIdAndUpdate(id, note, { new: true })
+  Note.findByIdAndUpdate(
+    id,
+    { content, important },
+    { new: true, runValidators: true, context: 'query' }
+  )
     .then(updatedNote => res.json(updatedNote))
     .catch(err => next(err));
 });
@@ -86,11 +93,14 @@ const unknownEndpoint = (req, res) => {
 
 app.use(unknownEndpoint);
 
+// Error Handling Functionality
 const errorHandler = (error, req, res, next) => {
   console.log(error.message);
 
   if (error.name === 'CastError') {
     return res.status(400).send({ error: 'malformatted id' });
+  } else if (error.name === 'ValidationError') {
+    return res.status(400).json({ error: error.message });
   }
 
   next(error);
