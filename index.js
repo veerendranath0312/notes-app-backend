@@ -1,11 +1,34 @@
-const http = require('http')
+const express = require("express");
 
-const app = require('./app.js')
-const config = require('./utils/config.js')
-const logger = require('./utils/logger.js')
+const app = express();
+const PORT = 3001;
 
-const server = http.createServer(app)
+let notes = [
+  {
+    id: 1,
+    content: "HTML is easy",
+    important: true,
+  },
+  {
+    id: 2,
+    content: "Browser can execute only JavaScript",
+    important: false,
+  },
+  {
+    id: 3,
+    content: "GET and POST are the most important methods of HTTP protocol",
+    important: true,
+  },
+];
 
-server.listen(config.PORT, () => {
-  logger.info(`Server running on port ${config.PORT}`)
-})
+app.get("/", (req, res) => {
+  res.status(200).send("<h2>Hello from server</h2>");
+});
+
+app.get("/api/notes", (req, res) => {
+  res.status(200).json({ data: notes });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}/`);
+});
