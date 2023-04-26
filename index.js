@@ -22,11 +22,20 @@ let notes = [
 ];
 
 app.get("/", (req, res) => {
-  res.status(200).send("<h2>Hello from server</h2>");
+  res.status(200).send("<h2>Welcome to Notes API</h2>");
 });
 
-app.get("/api/notes", (req, res) => {
-  res.status(200).json({ data: notes });
+app.get("/api/notes/:id", (req, res) => {
+  const { id } = req.params;
+  const note = notes.find((note) => note.id === Number(id));
+
+  if (!note) {
+    return res
+      .status(400)
+      .json({ msg: "Data not found or provide a valid number" });
+  }
+
+  res.status(200).json({ data: note });
 });
 
 app.listen(PORT, () => {
