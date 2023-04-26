@@ -51,7 +51,8 @@ app.delete("/api/notes/:id", (req, res) => {
 app.post("/api/notes", (req, res) => {
   const data = req.body;
 
-  const maxId = notes.length > onsole.log(req.headers);
+  const maxId =
+    notes.length > 0 ? Math.max(...notes.map((note) => note.id)) : 0;
 
   const newNote = {
     id: maxId + 1,
@@ -63,6 +64,12 @@ app.post("/api/notes", (req, res) => {
 
   res.status(201).json({ data: notes });
 });
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}/`);
