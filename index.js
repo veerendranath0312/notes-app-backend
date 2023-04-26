@@ -3,6 +3,8 @@ const express = require("express");
 const app = express();
 const PORT = 3001;
 
+app.use(express.json()); // parse the incoming JSON
+
 let notes = [
   {
     id: 1,
@@ -36,6 +38,30 @@ app.get("/api/notes/:id", (req, res) => {
   }
 
   res.status(200).json({ data: note });
+});
+
+app.delete("/api/notes/:id", (req, res) => {
+  const { id } = req.params;
+
+  notes = notes.filter((note) => note.id !== id);
+
+  res.status(204).end();
+});
+
+app.post("/api/notes", (req, res) => {
+  const data = req.body;
+
+  const maxId = notes.length > onsole.log(req.headers);
+
+  const newNote = {
+    id: maxId + 1,
+    content: data.content,
+    important: Math.random() < 0.5,
+  };
+
+  notes = [...notes, newNote];
+
+  res.status(201).json({ data: notes });
 });
 
 app.listen(PORT, () => {
