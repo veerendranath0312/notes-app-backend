@@ -5,9 +5,6 @@
 
 app = "notesapp-microservice"
 primary_region = "ams"
-
-[env]
-  PORT = "8080"
   
 [http_service]
   internal_port = 8080
