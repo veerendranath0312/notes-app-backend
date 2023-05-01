@@ -5,6 +5,7 @@ const app = express()
 
 app.use(cors())
 app.use(express.json()) // parse the incoming JSON
+app.use(express.static('dist'))
 
 let notes = [
   {
