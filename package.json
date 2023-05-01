@@ -7,7 +7,6 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "deploy": "fly deploy",
-    "deploy:full": "npm run build:ui && npm deploy",
     "logs:prod": "fly logs"
   },
   "keywords": [],
