@@ -1,14 +1,15 @@
 const mongoose = require('mongoose')
+const logger = require('../utils/logger.js')
 
-const connectDB = async url => {
+const connectDB = async (url) => {
   try {
     await mongoose.connect(url, {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
     })
-    console.log('connected to mongoDB')
+    logger.info('connected to mongoDB')
   } catch (error) {
-    console.log('error connecting to MongoDB: ', error.message)
+    logger.error('error connecting to MongoDB: ', error.message)
   }
 }
 
