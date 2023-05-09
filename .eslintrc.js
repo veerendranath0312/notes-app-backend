@@ -2,12 +2,13 @@ module.exports = {
   env: {
     commonjs: true,
     es2021: true,
-    node: true
+    node: true,
+    jest: true,
   },
   extends: 'eslint:recommended',
   overrides: [],
   parserOptions: {
-    ecmaVersion: 'latest'
+    ecmaVersion: 'latest',
   },
   rules: {
     indent: ['error', 2],
@@ -28,6 +29,6 @@ module.exports = {
     'arrow-spacing': ['error', { before: true, after: true }],
 
     // Disable console.log commands
-    'no-console': 0
-  }
+    'no-console': 0,
+  },
 }
