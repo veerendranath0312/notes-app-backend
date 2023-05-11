@@ -1,3 +1,4 @@
+require('express-async-errors')
 const express = require('express')
 const cors = require('cors')
 const notesRouter = require('./controllers/notes.js')

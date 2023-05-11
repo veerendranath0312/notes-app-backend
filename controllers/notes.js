@@ -4,12 +4,13 @@ const Note = require('../models/note.js')
 const notesRouter = express.Router()
 
 // Get all notes
-notesRouter.get('/', (req, res) => {
-  Note.find({}).then((notes) => res.json(notes))
+notesRouter.get('/', async (req, res) => {
+  const notes = await Note.find({})
+  res.json(notes)
 })
 
 // Create a note
-notesRouter.post('/', (req, res, next) => {
+notesRouter.post('/', async (req, res) => {
   const data = req.body
 
   const newNote = new Note({
@@ -17,29 +18,20 @@ notesRouter.post('/', (req, res, next) => {
     important: data.important || false,
   })
 
-  newNote
-    .save()
-    .then((savedNote) => {
-      res.status(201).json(savedNote)
-    })
-    .catch((error) => next(error))
+  const savedNote = await newNote.save()
+  res.status(201).json(savedNote)
 })
 
 // Get a note
-notesRouter.get('/:id', (req, res, next) => {
+notesRouter.get('/:id', async (req, res) => {
   const { id } = req.params
 
-  Note.findById(id)
-    .then((note) => {
-      if (note) {
-        res.status(200).json(note)
-      } else {
-        res.status(404).json({ msg: 'note you are searching not found' })
-      }
-    })
-    .catch((error) => {
-      next(error)
-    })
+  const note = await Note.findById(id)
+  if (note) {
+    res.status(200).json(note)
+  } else {
+    res.status(404).json({ msg: 'note you are searching not found' })
+  }
 })
 
 // Update a note
@@ -64,12 +56,10 @@ notesRouter.put('/:id', (req, res, next) => {
 })
 
 // Delete a note
-notesRouter.delete('/:id', (req, res, next) => {
+notesRouter.delete('/:id', async (req, res) => {
   const { id } = req.params
-
-  Note.findByIdAndRemove(id)
-    .then(() => res.status(204).end())
-    .catch((error) => next(error))
+  await Note.findByIdAndRemove(id)
+  res.status(204).end()
 })
 
 module.exports = notesRouter
