@@ -1,17 +1,29 @@
-const app = require('./app.js')
-const connectDB = require('./db/connect.js')
-const logger = require('./utils/logger.js')
-const config = require('./utils/config.js')
+const http = require('http')
 
-const start = async () => {
-  try {
-    await connectDB(config.MONGODB_URI)
-    app.listen(config.PORT, () => {
-      logger.info(`Server running at http://localhost:${config.PORT}/`)
-    })
-  } catch (error) {
-    logger.error('Error: ', error.message)
-  }
-}
+const notes = [
+  {
+    id: 1,
+    content: 'HTML is easy',
+    important: true,
+  },
+  {
+    id: 2,
+    content: 'Browser can execute only JavaScript',
+    important: true,
+  },
+  {
+    id: 3,
+    content: 'GET and POST are the most important methods of HTTP protocol',
+    important: true,
+  },
+]
 
-start()
+const app = http.createServer((req, res) => {
+  res.writeHead(200, { 'content-type': 'application/json' })
+  res.end(JSON.stringify(notes))
+})
+
+const PORT = 3001
+
+app.listen(PORT)
+console.log(`Server running on port ${PORT}`)
