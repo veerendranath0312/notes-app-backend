@@ -1,7 +1,6 @@
 const express = require('express')
 
 const app = express()
-app.use(express.json()) // Parse the input data
 
 let notes = [
   {
@@ -20,6 +19,20 @@ let notes = [
     important: true,
   },
 ]
+
+const requestLogger = (req, res, next) => {
+  console.log('Method: ', req.method)
+  console.log('Path: ', req.path)
+  console.log('Body: ', req.body)
+
+  // If the current middleware function does not end the request-response cycle,
+  // it must call next() to pass control to the next middleware function. Otherwise, the request will be left hanging.
+  next()
+}
+
+// Middleware functions have to be used before routes when we want them to be executed by the route event handlers.
+app.use(express.json()) // Middleware to parse the input JSON data
+app.use(requestLogger) // Custom middleware
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello World</h1>')
@@ -71,6 +84,14 @@ app.delete('/api/notes/:id', (req, res) => {
 
   res.status(204).end()
 })
+
+// Sometimes, we want to use middleware functions after routes.
+// We do this when the middleware functions are only called if no route handler processes the HTTP request.
+const unknownEndpoint = (req, res) => {
+  res.status(404).json({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
 
 const PORT = 8080
 
