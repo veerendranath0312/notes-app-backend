@@ -32,6 +32,7 @@ const requestLogger = (req, res, next) => {
 }
 
 // Middleware functions have to be used before routes when we want them to be executed by the route event handlers.
+app.use(express.static('dist')) // Middleware to serve static files
 app.use(cors())
 app.use(express.json()) // Middleware to parse the input JSON data
 app.use(requestLogger) // Custom middleware
