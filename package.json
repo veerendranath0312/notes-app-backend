@@ -7,7 +7,11 @@
   "author": "Veerendranath <veerendranath0312@gmail.com>",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build:ui": "rm -rf dist && cd ../../fullstackopen-local/ && yarn run build && cp -r dist ../veerendranath/notes-app-backend",
+    "deploy": "fly deploy",
+    "deploy:full": "yarn run build:ui && yarn run deploy",
+    "logs:prod": "fly logs"
   },
   "license": "MIT",
   "dependencies": {
