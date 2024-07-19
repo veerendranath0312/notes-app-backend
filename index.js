@@ -1,30 +1,13 @@
+require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
+const Note = require('./models/note.js')
 
 const app = express()
-
-let notes = [
-  {
-    id: 1,
-    content: 'HTML is easy',
-    important: true,
-  },
-  {
-    id: 2,
-    content: 'Browser can execute only JavaScript',
-    important: true,
-  },
-  {
-    id: 3,
-    content: 'GET and POST are the most important methods of HTTP protocol',
-    important: true,
-  },
-]
 
 const requestLogger = (req, res, next) => {
   console.log('Method: ', req.method)
   console.log('Path: ', req.path)
-  console.log('Body: ', req.body)
 
   // If the current middleware function does not end the request-response cycle,
   // it must call next() to pass control to the next middleware function. Otherwise, the request will be left hanging.
@@ -42,25 +25,18 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/notes', (req, res) => {
-  res.status(200).json(notes)
+  Note.find({}).then((notes) => {
+    res.status(200).json(notes)
+  })
 })
 
 app.get('/api/notes/:id', (req, res) => {
   const id = req.params.id
-  const note = notes.find((note) => note.id === Number(id))
 
-  // Guard clause to check if the note with the requested is not found
-  if (!note) {
-    return res.status(404).json({ message: `Note with id ${id} is not found` })
-  }
-
-  res.json(note)
+  Note.findById(id).then((note) => {
+    res.status(200).json(note)
+  })
 })
-
-const generateId = () => {
-  const maxId = notes.length > 0 ? Math.max(...notes.map((note) => note.id)) : 0
-  return maxId + 1
-}
 
 app.post('/api/notes', (req, res) => {
   const body = req.body
@@ -70,15 +46,14 @@ app.post('/api/notes', (req, res) => {
     return res.status(400).json({ error: 'content missing' })
   }
 
-  const note = {
-    id: generateId(),
+  const newNote = new Note({
     content: body.content,
     important: Boolean(body.important) || false,
-  }
+  })
 
-  notes = [...notes, note]
-
-  res.json(notes)
+  newNote.save().then((savedNote) => {
+    res.status(201).json(savedNote)
+  })
 })
 
 app.delete('/api/notes/:id', (req, res) => {
