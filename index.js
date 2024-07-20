@@ -30,12 +30,20 @@ app.get('/api/notes', (req, res) => {
   })
 })
 
-app.get('/api/notes/:id', (req, res) => {
+app.get('/api/notes/:id', (req, res, next) => {
   const id = req.params.id
 
-  Note.findById(id).then((note) => {
-    res.status(200).json(note)
-  })
+  Note.findById(id)
+    .then((note) => {
+      if (note) {
+        res.status(200).json(note)
+      } else {
+        res.status(404).end()
+      }
+    })
+    .catch((error) => {
+      next(error)
+    })
 })
 
 app.post('/api/notes', (req, res) => {
@@ -56,11 +64,29 @@ app.post('/api/notes', (req, res) => {
   })
 })
 
+app.put('/api/notes/:id', (req, res) => {
+  const id = req.params.id
+  const body = req.body
+
+  const note = {
+    content: body.content,
+    important: body.important,
+  }
+
+  Note.findByIdAndUpdate(id, note, { new: true })
+    .then((updatedNote) => {
+      res.status(200).json(updatedNote)
+    })
+    .catch((error) => next(error))
+})
+
 app.delete('/api/notes/:id', (req, res) => {
   const id = req.params.id
-  notes = notes.filter((note) => note.id !== Number(id))
-
-  res.status(204).end()
+  Note.findByIdAndDelete(id)
+    .then(() => {
+      res.status(204).end()
+    })
+    .catch((error) => next(error))
 })
 
 // Sometimes, we want to use middleware functions after routes.
@@ -69,8 +95,21 @@ const unknownEndpoint = (req, res) => {
   res.status(404).json({ error: 'unknown endpoint' })
 }
 
+const errorHandler = (error, req, res, next) => {
+  console.log(error.message)
+
+  if (error.name === 'CastError') {
+    return res.status(400).json({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
 app.use(unknownEndpoint)
 
+// This has to be the last loaded middleware,
+// also all the routes should be registered before this!
+app.use(errorHandler)
 const PORT = process.env.PORT || 8080
 
 app.listen(PORT, () => {
