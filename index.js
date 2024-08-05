@@ -62,7 +62,7 @@ app.post('/api/notes', (req, res, next) => {
     .catch((error) => next(error))
 })
 
-app.put('/api/notes/:id', (req, res) => {
+app.put('/api/notes/:id', (req, res, next) => {
   const id = req.params.id
   const body = req.body
 
@@ -82,7 +82,7 @@ app.put('/api/notes/:id', (req, res) => {
     .catch((error) => next(error))
 })
 
-app.delete('/api/notes/:id', (req, res) => {
+app.delete('/api/notes/:id', (req, res, next) => {
   const id = req.params.id
   Note.findByIdAndDelete(id)
     .then(() => {
@@ -102,7 +102,7 @@ const errorHandler = (error, req, res, next) => {
 
   if (error.name === 'CastError') {
     return res.status(400).json({ error: 'malformatted id' })
-  } else if ((error.name = 'ValidationError')) {
+  } else if (error.name === 'ValidationError') {
     return res.status(400).json({ error: error.message })
   }
 

@@ -11,7 +11,8 @@
     "build:ui": "rm -rf dist && cd ../../fullstackopen-local/ && yarn run build && cp -r dist ../veerendranath/notes-app-backend",
     "deploy": "fly deploy",
     "deploy:full": "yarn run build:ui && yarn run deploy",
-    "logs:prod": "fly logs"
+    "logs:prod": "fly logs",
+    "lint": "eslint ."
   },
   "license": "MIT",
   "dependencies": {
@@ -21,6 +22,10 @@
     "mongoose": "^8.5.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.8.0",
+    "@stylistic/eslint-plugin-js": "^2.6.1",
+    "eslint": "9.x",
+    "globals": "^15.9.0",
     "nodemon": "^3.1.4"
   }
 }
