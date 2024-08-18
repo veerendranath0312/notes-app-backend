@@ -6,8 +6,8 @@
   "repository": "git@github.com:veerendranath0312/notes-app-backend.git",
   "author": "Veerendranath <veerendranath0312@gmail.com>",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
     "build:ui": "rm -rf dist && cd ../../fullstackopen-local/ && yarn run build && cp -r dist ../veerendranath/notes-app-backend",
     "deploy": "fly deploy",
     "deploy:full": "yarn run build:ui && yarn run deploy",
