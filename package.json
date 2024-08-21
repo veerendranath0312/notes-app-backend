@@ -12,7 +12,8 @@
     "deploy": "fly deploy",
     "deploy:full": "yarn run build:ui && yarn run deploy",
     "logs:prod": "fly logs",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "node --test"
   },
   "license": "MIT",
   "dependencies": {
