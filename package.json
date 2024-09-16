@@ -6,14 +6,14 @@
   "repository": "git@github.com:veerendranath0312/notes-app-backend.git",
   "author": "Veerendranath <veerendranath0312@gmail.com>",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "NODE_ENV=production node server.js",
+    "dev": "NODE_ENV=development nodemon server.js",
     "build:ui": "rm -rf dist && cd ../../fullstackopen-local/ && yarn run build && cp -r dist ../veerendranath/notes-app-backend",
     "deploy": "fly deploy",
     "deploy:full": "yarn run build:ui && yarn run deploy",
     "logs:prod": "fly logs",
     "lint": "eslint .",
-    "test": "node --test"
+    "test": "NODE_ENV=test node --test"
   },
   "license": "MIT",
   "dependencies": {
@@ -27,6 +27,7 @@
     "@stylistic/eslint-plugin-js": "^2.6.1",
     "eslint": "9.x",
     "globals": "^15.9.0",
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.4",
+    "supertest": "^7.0.0"
   }
 }

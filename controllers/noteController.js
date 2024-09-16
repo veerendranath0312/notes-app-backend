@@ -1,9 +1,8 @@
 const Note = require('../models/note.js')
 
-const getAllNotes = (req, res) => {
-  Note.find({}).then((notes) => {
-    res.status(200).json(notes)
-  })
+const getAllNotes = async (req, res) => {
+  const notes = await Note.find({})
+  res.status(200).json(notes)
 }
 
 const getNote = (req, res, next) => {
