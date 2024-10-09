@@ -1,7 +1,8 @@
 const Note = require('../models/note.js')
+const User = require('../models/user.js')
 
 const getAllNotes = async (req, res) => {
-  const notes = await Note.find({})
+  const notes = await Note.find({}).populate('user', { username: 1, name: 1 })
   res.status(200).json(notes)
 }
 
@@ -19,10 +20,17 @@ const getNote = async (req, res) => {
 const createNote = async (req, res) => {
   const body = req.body
 
+  const user = await User.findById(body.userId)
+
   const createdNote = await Note.create({
     content: body.content,
     important: body.important || false,
+    user: user.id,
   })
+
+  user.notes = [...user.notes, createdNote._id]
+  console.log(user.notes)
+  await user.save()
 
   res.status(201).json(createdNote)
 }
