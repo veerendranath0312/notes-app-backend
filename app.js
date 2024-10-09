@@ -4,6 +4,7 @@ const cors = require('cors')
 require('express-async-errors')
 const mongoose = require('mongoose')
 const notesRouter = require('./routes/noteRoutes.js')
+const usersRouter = require('./routes/userRouter.js')
 const middleware = require('./utils/middleware.js')
 const logger = require('./utils/logger.js')
 
@@ -26,6 +27,7 @@ app.use(express.json()) // Middleware to parse the input JSON data
 app.use(middleware.requestLogger) // Custom middleware
 
 app.use('/api/notes', notesRouter)
+app.use('/api/users', usersRouter)
 
 app.use(middleware.unknownEndpoint)
 

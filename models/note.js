@@ -7,6 +7,11 @@ const noteSchema = new mongoose.Schema({
     required: true,
   },
   important: Boolean,
+  // references the user who created it
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
 })
 
 // Format the objects returned by Mongoose using 'toJSON' method of the schema,
